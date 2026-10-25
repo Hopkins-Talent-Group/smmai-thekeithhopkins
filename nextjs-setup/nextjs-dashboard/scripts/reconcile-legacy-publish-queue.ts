@@ -29,13 +29,13 @@ async function main() {
     const policy = await redis.config("GET", "maxmemory-policy");
     if (policy[1] !== "noeviction") throw new Error(`maxmemory-policy noeviction required, found ${policy[1] || "unknown"}`);
 
-    const pendingIds = await redis.zrange(LEGACY_PENDING, 0, LIMIT - 1);
+    const pendingIds = await redis.zrange(LEGACY_PENDING, "0", String(LIMIT - 1));
     const pendingSet = new Set(pendingIds);
     const candidates = new Set(pendingIds);
     let cursor = "0";
     let scanned = 0;
     do {
-      const [next, keys] = await redis.scan(cursor, "MATCH", `${LEGACY_PAYLOAD_PREFIX}*`, "COUNT", 100);
+      const [next, keys] = await redis.scan(cursor, "MATCH", `${LEGACY_PAYLOAD_PREFIX}*`, "COUNT", "100");
       cursor = next;
       for (const key of keys) {
         const id = key.slice(LEGACY_PAYLOAD_PREFIX.length);

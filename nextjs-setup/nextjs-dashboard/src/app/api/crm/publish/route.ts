@@ -1,4 +1,4 @@
-import { after, NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
 import prisma from "@/lib/prisma";
 import { verifySession } from "@/lib/auth";
@@ -74,10 +74,8 @@ export async function POST(req: NextRequest) {
       return { job, record, responseBody };
     });
 
-    // Use Next.js after() for deferred state transitions.
-    // Phase 2: DRY_RUN is a server-authoritative safety gate. A dry-run must
-    // record a simulated result and return the draft to "approved" — it must
-    // never be marked published, and no provider call may run.
+    // Keep the server-authoritative dry-run gate, but do not schedule a second
+    // deferred callback that can falsely mark a queued job as published.
     const dryRun = process.env.DRY_RUN !== "false";
     const persisted = await prisma.systemState.upsert({
       where: { id: "singleton" },
@@ -89,7 +87,6 @@ export async function POST(req: NextRequest) {
       typeof persistedSettings?.dryRun === "boolean" ? persistedSettings.dryRun : (persisted?.dryRun ?? dryRun);
 
     if (effectiveDryRun) {
-      // No queue handoff in dry-run: no provider worker ever owns this job.
       const simulated = await prisma.publishJob.update({
         where: { id: result.job.id },
         data: { status: "CANCELLED", error: "dry-run: publish not sent", completedAt: new Date() },
@@ -107,38 +104,6 @@ export async function POST(req: NextRequest) {
       });
       return NextResponse.json({ ...result.responseBody, dryRun: true, status: "simulated", job: simulated }, { status: 202 });
     }
-
-    after(async () => {
-      try {
-        await prisma.publishJob.update({ where: { id: result.job.id }, data: { status: "SUCCEEDED", completedAt: new Date() } });
-        await prisma.contentDraft.update({ where: { id: String(draftId) }, data: { status: "published", publishedAt: new Date() } });
-        await writeAuditEvent({
-          workspaceId: session.payload.workspaceId,
-          actorUserId: session.payload.userId,
-          action: "draft.published",
-          resourceType: "draft",
-          resourceId: String(draftId),
-          requestId,
-          ipHash: clientIp,
-          metadata: { platform, jobId: result.job.id, dryRun: false },
-        });
-      } catch (err) {
-        await prisma.publishJob.update({
-          where: { id: result.job.id },
-          data: { status: "FAILED", error: err instanceof Error ? err.message : "Unknown error", completedAt: new Date() },
-        });
-        await writeAuditEvent({
-          workspaceId: session.payload.workspaceId,
-          actorUserId: session.payload.userId,
-          action: "job.failed",
-          resourceType: "publishJob",
-          resourceId: result.job.id,
-          requestId,
-          ipHash: clientIp,
-          metadata: { platform, draftId: String(draftId), error: err instanceof Error ? err.message : "Unknown error" },
-        });
-      }
-    });
 
     try {
       await enqueuePublishJob({
@@ -178,10 +143,10 @@ export async function POST(req: NextRequest) {
       resourceId: result.job.id,
       requestId,
       ipHash: clientIp,
-      metadata: { platform, draftId: String(draftId), dryRun: effectiveDryRun },
+      metadata: { platform, draftId: String(draftId), dryRun: false },
     });
 
-    return NextResponse.json({ ...result.responseBody, dryRun: effectiveDryRun, idempotencyRecordId: result.record.id }, { status: 202 });
+    return NextResponse.json({ ...result.responseBody, dryRun: false, idempotencyRecordId: result.record.id }, { status: 202 });
   } catch (error) {
     const code = (error as { code?: string }).code;
     if (code === "P2002") {

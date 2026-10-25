@@ -1,5 +1,4 @@
 import Redis from "ioredis";
-import crypto from "crypto";
 
 let redis: Redis | undefined;
 let versionChecked = false;
@@ -65,8 +64,14 @@ local id=ARGV[1]; local payload=ARGV[2]
 local pending=KEYS[1]; local processing=KEYS[2]; local dlq=KEYS[3]; local quarantine=KEYS[4]; local job=KEYS[5]
 if redis.call('ZSCORE',pending,id) or redis.call('ZSCORE',processing,id) or redis.call('ZSCORE',dlq,id) or redis.call('ZSCORE',quarantine,id) then return 0 end
 if redis.call('HGET',job,'payload') then return 0 end
+local oldgen=redis.call('HGET',job,'generation'); local oldstate=redis.call('HGET',job,'state')
+if oldgen and oldstate~='acked' then return 0 end
 local t=redis.call('TIME'); local now=tonumber(t[1])*1000+math.floor(tonumber(t[2])/1000)
-redis.call('HSET',job,'payload',payload,'generation',0,'attempts',0,'state','pending')
+if oldgen then
+ redis.call('HSET',job,'payload',payload,'attempts',0,'state','pending','marker','')
+else
+ redis.call('HSET',job,'payload',payload,'generation',0,'attempts',0,'state','pending','marker','')
+end
 redis.call('ZADD',pending,now,id)
 return 1
 `;
@@ -96,8 +101,8 @@ if tonumber(redis.call('HGET',job,'generation') or '-1')~=gen or not redis.call(
 local existing=redis.call('HGET',job,'marker')
 if existing and existing~='' then return 0 end
 local t=redis.call('TIME'); local now=tonumber(t[1])*1000+math.floor(tonumber(t[2])/1000)
-local decoded=cjson.decode(marker); decoded.prepared_at=now; decoded.status='dispatching'
-redis.call('HSET',job,'marker',cjson.encode(decoded),'dispatch_started_at',now)
+local decoded=cjson.decode(marker); decoded.prepared_at=now; decoded.status='dispatching'; decoded.attempt=tonumber(redis.call('HGET',job,'attempts') or '0')
+redis.call('HSET',job,'marker',cjson.encode(decoded), 'marker:'..gen, cjson.encode(decoded), 'dispatch_started_at',now)
 return 1
 `;
 const ACK_LUA = `
@@ -105,7 +110,7 @@ local job=KEYS[1]; local processing=KEYS[2]; local id=ARGV[1]; local gen=tonumbe
 if tonumber(redis.call('HGET',job,'generation') or '-1')~=gen then return -1 end
 if redis.call('HGET',job,'state')~='processing' then return -2 end
 local marker=redis.call('HGET',job,'marker')
-if marker and marker~='' then local m=cjson.decode(marker); m.status='success'; m.external_id=external; redis.call('HSET',job,'marker',cjson.encode(m)) end
+if marker and marker~='' then local m=cjson.decode(marker); m.status='success'; m.external_id=external; redis.call('HSET',job,'marker:'..gen,cjson.encode(m),'marker','') end
 redis.call('ZREM',processing,id); redis.call('HSET',job,'state','acked','external_id',external,'acked_at',redis.call('TIME')[1])
 redis.call('HDEL',job,'payload','lease_until')
 return 1
@@ -129,12 +134,13 @@ if redis.call('HGET',job,'state')~='processing' then return -2 end
 local marker=redis.call('HGET',job,'marker')
 if marker and marker~='' then local m=cjson.decode(marker); m.status='quarantined'; m.reason=reason; redis.call('HSET',job,'marker',cjson.encode(m)) end
 local t=redis.call('TIME'); local now=tonumber(t[1])*1000+math.floor(tonumber(t[2])/1000)
+if marker and marker~='' then local m=cjson.decode(marker); m.status='quarantined'; m.reason=reason; redis.call('HSET',job,'marker:'..gen,cjson.encode(m),'marker',cjson.encode(m)) end
 redis.call('ZREM',processing,id); redis.call('ZADD',quarantine,now,id); redis.call('HSET',job,'state','quarantine','last_error',reason); return 1
 `;
 
 export const enqueuePublishJob = async (event: PublishJobEvent): Promise<string> => {
   await ensureConnected();
-  const result = await getRedis().eval(ENQUEUE_LUA, 5, QUEUE_KEYS.pending, QUEUE_KEYS.processing, QUEUE_KEYS.dlq, QUEUE_KEYS.quarantine, jobKey(event.jobId), event.jobId, JSON.stringify(event));
+  await getRedis().eval(ENQUEUE_LUA, 5, QUEUE_KEYS.pending, QUEUE_KEYS.processing, QUEUE_KEYS.dlq, QUEUE_KEYS.quarantine, jobKey(event.jobId), event.jobId, JSON.stringify(event));
   return event.jobId;
 };
 
@@ -148,47 +154,71 @@ export const dequeuePublishJob = async (): Promise<ClaimedPublishJob> => {
   catch { await addToDLQ(String(jobId), "corrupt payload"); return { jobId: String(jobId), event: null }; }
 };
 
+const recordFenceRejection = async (jobId: string, suppliedGen: number, operation: string, reason: string): Promise<void> => {
+  const client = getRedis();
+  const key = jobKey(jobId);
+  const [currentGen, state] = await client.hmget(key, "generation", "state");
+  await client.hincrby(`${QUEUE_TAG}:metrics`, "stale_fence_rejections", 1);
+  console.error(JSON.stringify({
+    event: "queue_stale_fence_rejected", job_id: jobId, supplied_gen: suppliedGen,
+    current_gen: currentGen === null ? null : Number(currentGen), operation,
+    queue_state: state || "missing", worker_id: process.env.WORKER_ID || "unknown",
+    reason, timestamp: new Date().toISOString(),
+  }));
+};
+
 export const markPublishDispatched = async (jobId: string, generation: number, contentHash: string, dispatchAttemptId: string): Promise<void> => {
   await ensureConnected();
   const marker = JSON.stringify({ job_id: jobId, generation, dispatch_attempt_id: dispatchAttemptId, content_hash: contentHash, attempt: 0, provider_result: null });
   const result = Number(await getRedis().eval(MARK_DISPATCH_LUA, 2, jobKey(jobId), QUEUE_KEYS.processing, jobId, generation, marker));
-  if (result !== 1) throw new Error(`stale_or_invalid_dispatch_marker job_id=${jobId} supplied_gen=${generation}`);
+  if (result !== 1) { await recordFenceRejection(jobId, generation, "mark_dispatch", "generation_or_lease_mismatch"); throw new Error(`stale_or_invalid_dispatch_marker job_id=${jobId} supplied_gen=${generation}`); }
 };
 export const ackPublishJob = async (jobId: string, generation: number, externalId = ""): Promise<void> => {
   await ensureConnected();
   const result = Number(await getRedis().eval(ACK_LUA, 2, jobKey(jobId), QUEUE_KEYS.processing, jobId, generation, externalId));
-  if (result !== 1) throw new Error(`stale_or_invalid_ack job_id=${jobId} supplied_gen=${generation} result=${result}`);
+  if (result !== 1) { await recordFenceRejection(jobId, generation, "ack", `fenced_result_${result}`); throw new Error(`stale_or_invalid_ack job_id=${jobId} supplied_gen=${generation} result=${result}`); }
 };
 export const retryPublishJob = async (jobId: string, generation: number, reason: string): Promise<void> => {
   await ensureConnected();
   const delay = Math.min(300_000, BACKOFF_BASE_MS * 2 ** Math.max(0, generation - 1));
   const result = Number(await getRedis().eval(RETRY_LUA, 4, jobKey(jobId), QUEUE_KEYS.processing, QUEUE_KEYS.pending, QUEUE_KEYS.dlq, jobId, generation, reason, delay, MAX_ATTEMPTS));
-  if (result < 0) throw new Error(`retry_rejected job_id=${jobId} supplied_gen=${generation} result=${result}`);
+  if (result < 0) { await recordFenceRejection(jobId, generation, "retry", `fenced_result_${result}`); throw new Error(`retry_rejected job_id=${jobId} supplied_gen=${generation} result=${result}`); }
 };
 export const quarantinePublishJob = async (jobId: string, generation: number, reason: string): Promise<void> => {
   await ensureConnected();
   const result = Number(await getRedis().eval(QUARANTINE_LUA, 3, jobKey(jobId), QUEUE_KEYS.processing, QUEUE_KEYS.quarantine, jobId, generation, reason));
-  if (result !== 1) throw new Error(`quarantine_rejected job_id=${jobId} supplied_gen=${generation} result=${result}`);
+  if (result !== 1) { await recordFenceRejection(jobId, generation, "quarantine", `fenced_result_${result}`); throw new Error(`quarantine_rejected job_id=${jobId} supplied_gen=${generation} result=${result}`); }
 };
-export const addToDLQ = async (jobId: string, reason: string): Promise<void> => {
+const DLQ_LUA = `
+local job=KEYS[1]; local pending=KEYS[2]; local processing=KEYS[3]; local dlq=KEYS[4]
+local id=ARGV[1]; local reason=ARGV[2]; local expected=ARGV[3]
+if expected and expected~='' then
+  if tonumber(redis.call('HGET',job,'generation') or '-1')~=tonumber(expected) then return -1 end
+  if redis.call('HGET',job,'state')~='processing' then return -2 end
+  local marker=redis.call('HGET',job,'marker')
+  if marker and marker~='' then return -3 end
+end
+local t=redis.call('TIME'); local now=tonumber(t[1])*1000+math.floor(tonumber(t[2])/1000)
+redis.call('ZREM',pending,id); redis.call('ZREM',processing,id); redis.call('ZADD',dlq,now,id)
+redis.call('HSET',job,'state','dlq','last_error',reason); redis.call('HDEL',job,'lease_until')
+return 1
+`;
+export const addToDLQ = async (jobId: string, reason: string, generation?: number): Promise<void> => {
   await ensureConnected();
-  const key = jobKey(jobId);
-  const now = Date.now();
-  await getRedis().hset(key, "state", "dlq", "last_error", reason);
-  await getRedis().zrem(QUEUE_KEYS.pending, jobId, QUEUE_KEYS.processing, jobId);
-  await getRedis().zadd(QUEUE_KEYS.dlq, now, jobId);
+  const result = Number(await getRedis().eval(DLQ_LUA, 4, jobKey(jobId), QUEUE_KEYS.pending, QUEUE_KEYS.processing, QUEUE_KEYS.dlq, jobId, reason, generation === undefined ? "" : String(generation)));
+  if (result !== 1) throw new Error(`dlq_rejected job_id=${jobId} supplied_gen=${generation ?? "legacy"} result=${result}`);
 };
 export const getQueueLength = async (): Promise<number> => { await ensureConnected(); return getRedis().zcard(QUEUE_KEYS.pending); };
 export const getDLQLength = async (): Promise<number> => { await ensureConnected(); return getRedis().zcard(QUEUE_KEYS.dlq); };
 export const getQuarantineLength = async (): Promise<number> => { await ensureConnected(); return getRedis().zcard(QUEUE_KEYS.quarantine); };
 export const getQueueStats = async (): Promise<{ pending: number; failed: number }> => ({ pending: await getQueueLength(), failed: await getDLQLength() });
 
-export const reconcileExpiredLeases = async (limit = 100): Promise<{ inspected: number; requeued: number; quarantined: number; deadLettered: number }> => {
+export const reconcileExpiredLeases = async (limit = 100, resolvePublished?: (jobId: string) => Promise<string | null>): Promise<{ inspected: number; requeued: number; quarantined: number; deadLettered: number; acknowledged: number }> => {
   await ensureConnected();
   const bounded = Math.max(1, Math.min(100, Math.floor(limit)));
   const now = Number(await getRedis().eval(timeMsLua, 0));
   const ids = await getRedis().zrangebyscore(QUEUE_KEYS.processing, "-inf", now, "LIMIT", 0, bounded);
-  const result = { inspected: 0, requeued: 0, quarantined: 0, deadLettered: 0 };
+  const result = { inspected: 0, requeued: 0, quarantined: 0, deadLettered: 0, acknowledged: 0 };
   for (const id of ids) {
     result.inspected++;
     const job = jobKey(id);
@@ -197,7 +227,21 @@ export const reconcileExpiredLeases = async (limit = 100): Promise<{ inspected: 
     if (stateRaw !== "processing" || !genRaw || !attemptsRaw) continue;
     const generation = Number(genRaw);
     if (!payload) { await getRedis().zrem(QUEUE_KEYS.processing, id); await getRedis().zadd(QUEUE_KEYS.dlq, now, id); await getRedis().hset(job, "state", "dlq", "last_error", "missing payload during lease reconciliation"); result.deadLettered++; continue; }
-    if (marker) { await quarantinePublishJob(id, generation, "lease expired after provider dispatch marker; outcome requires reconciliation"); result.quarantined++; continue; }
+    if (marker) {
+      let authoritativeExternalId: string | null = null;
+      if (resolvePublished) {
+        try { authoritativeExternalId = await resolvePublished(id); }
+        catch (error) { console.error(JSON.stringify({ event: "queue_db_reconciliation_error", job_id: id, generation, message: error instanceof Error ? error.message : String(error) })); }
+      }
+      if (authoritativeExternalId) {
+        await ackPublishJob(id, generation, authoritativeExternalId);
+        result.acknowledged++;
+        continue;
+      }
+      await quarantinePublishJob(id, generation, "lease expired after provider dispatch marker; outcome requires reconciliation");
+      result.quarantined++;
+      continue;
+    }
     await getRedis().zrem(QUEUE_KEYS.processing, id);
     if (Number(attemptsRaw) >= MAX_ATTEMPTS) { await getRedis().zadd(QUEUE_KEYS.dlq, now, id); await getRedis().hset(job, "state", "dlq", "last_error", "attempt limit reached during lease reconciliation"); result.deadLettered++; }
     else { await getRedis().hset(job, "state", "pending", "lease_until", 0); await getRedis().zadd(QUEUE_KEYS.pending, now, id); result.requeued++; }
@@ -206,3 +250,16 @@ export const reconcileExpiredLeases = async (limit = 100): Promise<{ inspected: 
 };
 
 export const getQueueKeyLayout = () => ({ tag: QUEUE_TAG, keys: Object.values(QUEUE_KEYS) });
+
+/** Close the shared Redis client during controlled shutdown and integration-test teardown. */
+export const closeQueueRedisConnection = async (): Promise<void> => {
+  if (!redis) return;
+  const client = redis;
+  redis = undefined;
+  versionChecked = false;
+  if (client.status === "ready" || client.status === "connect" || client.status === "connecting") {
+    await client.quit();
+  } else {
+    client.disconnect();
+  }
+};
