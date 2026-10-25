@@ -138,7 +138,11 @@ test("missing_redis_url_hard_fails", () => {
     timeout: 10_000,
   });
   assert.notEqual(child.status, 0, "suite must exit nonzero when REDIS_URL is absent");
-  assert.match(child.stderr, /REDIS_URL is required for queue integration tests/);
+  assert.match(
+    child.stderr,
+    /REDIS_URL is required for queue integration tests/,
+    "child must fail for the missing-REDIS_URL precondition, not a broken subprocess harness",
+  );
 });
 
 test("missing_legacy_payload_is_dead_lettered", async () => {
