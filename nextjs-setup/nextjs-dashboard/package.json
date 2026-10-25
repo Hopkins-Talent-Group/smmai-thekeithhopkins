@@ -11,7 +11,7 @@
     "postinstall": "prisma generate",
     "predev": "prisma generate",
     "prebuild": "prisma generate",
-    "test:queue": "node --import tsx --test tests/queue.integration.test.ts"
+    "test:queue": "node --import tsx --test --test-reporter=tap --test-concurrency=1 tests/queue.integration.test.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
