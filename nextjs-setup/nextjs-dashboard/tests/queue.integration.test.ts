@@ -6,7 +6,7 @@ import Redis from "ioredis";
 import crypto from "node:crypto";
 import {
   ackPublishJob, closeQueueRedisConnection, dequeuePublishJob, enqueuePublishJob, getQuarantineLength,
-  getQueueKeyLayout, getQueueLength, markPublishDispatched, QUEUE_KEYS,
+  getQueueKeyLayout, markPublishDispatched, QUEUE_KEYS,
   parseRedisMajorVersion, reconcileExpiredLeases, type PublishJobEvent,
 } from "../src/lib/queue";
 
