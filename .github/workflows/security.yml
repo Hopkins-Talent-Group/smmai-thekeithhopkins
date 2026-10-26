@@ -47,9 +47,9 @@ jobs:
       - name: Upgrade audit tooling
         run: python -m pip install --upgrade "setuptools>=84.1.0" "pip" "pip-audit"
       - run: pip-audit
+      # Use the repository root packageManager pin (pnpm@9.15.0) as the
+      # single source of truth; an explicit action version conflicts with it.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: 22
