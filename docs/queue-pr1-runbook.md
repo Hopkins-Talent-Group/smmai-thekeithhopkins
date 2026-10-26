@@ -1,5 +1,15 @@
 # PR1 durable publish queue operations
 
+## CI lint interpretation
+
+The dashboard ESLint gate is deliberately split into two signals:
+
+- **Blocking PR/push gate:** ESLint runs on changed dashboard JavaScript/TypeScript files only. A lint error in a changed file fails CI.
+- **Repository-wide baseline:** `npm run lint` still runs and reports findings, but is marked advisory while legacy lint debt is triaged. Its advisory success/failure must not be described as a clean repository-wide lint result.
+- **No blanket suppression:** do not add global ESLint disables, turn off rules across the app, or treat a green changed-file gate as proof that untouched files are clean. Fix legacy files in a separate scoped cleanup and restore a fully blocking repository-wide lint gate when the baseline is clean.
+
+The 2026-10-26 CI run `40274742134` passed Python tests and the dashboard production build, then failed repository-wide ESLint with 27 errors and 10 warnings. The errors were spread across untouched analytics, logout, auth, CRM, engagement, webhook, and login UI files. The two `no-explicit-any` violations in the changed login route were removed without changing the session data or behavior. Re-run CI on the updated PR head; do not treat the historical run as validation of the fix.
+
 ## Redis requirements
 
 - Redis 7.0 or newer is a hard requirement. Queue startup rejects older versions.
