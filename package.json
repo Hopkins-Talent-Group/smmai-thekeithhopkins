@@ -2,7 +2,7 @@
   "name": "social-media-smm-automation",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@9.15.9",
+  "packageManager": "pnpm@9.15.0",
   "scripts": {
     "dev": "pnpm --dir nextjs-setup/nextjs-dashboard dev",
     "build": "pnpm --dir nextjs-setup/nextjs-dashboard build",
