@@ -1,0 +1,5 @@
+# Exact historical fingerprints only: both findings were verified as non-secrets.
+# LinkedInAdapter is an imported symbol, not an OAuth client ID.
+ca88c8401b06ae743821cbc199293a9b684deb1a:src/smm/publishing/worker.ts:linkedin-client-id:4
+# .env.example intentionally contains the literal placeholder sk-or-v1-REPLACE_ME.
+a473eebfcf8575423cd62e19237a07e59e1e6ad1:.env.example:generic-api-key:47
