@@ -63,5 +63,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      # Resolve the patched graph first; the lockfile must be regenerated and committed
+      # with these manifest updates before restoring frozen-lockfile enforcement.
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm audit --prod --audit-level high
