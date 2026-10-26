@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm --dir nextjs-setup/nextjs-dashboard build"
+  "installCommand": "npx --yes pnpm@9.15.0 install --frozen-lockfile",
+  "buildCommand": "npx --yes pnpm@9.15.0 --dir nextjs-setup/nextjs-dashboard build"
 }
