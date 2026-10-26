@@ -28,20 +28,28 @@ jobs:
   secrets:
     name: Secret scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      # Use the upstream CLI directly: the GitHub Action requires a paid
-      # GITLEAKS_LICENSE for organization repositories.
+      # The official gitleaks-action v2 requires a paid organizational license.
+      # Use the upstream CLI directly; pin the release and verify its published SHA-256.
       - name: Install Gitleaks CLI
+        shell: bash
         run: |
           set -euo pipefail
-          version="8.24.3"
-          curl --fail --silent --show-error --location \
-            "https://github.com/gitleaks/gitleaks/releases/download/v${version}/gitleaks_${version}_linux_x64.tar.gz" \
-            | tar -xz -C "${RUNNER_TEMP}" gitleaks
-          echo "${RUNNER_TEMP}" >> "${GITHUB_PATH}"
+          version="8.30.1"
+          archive="gitleaks_${version}_linux_x64.tar.gz"
+          url="https://github.com/gitleaks/gitleaks/releases/download/v${version}/${archive}"
+          expected_sha256="551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+
+          curl --fail --silent --show-error --location "$url" --output "$RUNNER_TEMP/$archive"
+          echo "$expected_sha256  $RUNNER_TEMP/$archive" | sha256sum --check --status
+          tar -xzf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP" gitleaks
+          "$RUNNER_TEMP/gitleaks" version
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
       - name: Scan repository history for secrets
         run: gitleaks git . --redact --verbose --exit-code 1
 
@@ -54,16 +62,13 @@ jobs:
         with:
           python-version: "3.11"
       - name: Upgrade audit tooling
-        run: python -m pip install --upgrade "setuptools>=84.1.0" "pip" "pip-audit"
+        run: python -m pip install --upgrade "setuptools>=84.1.0" pip pip-audit
       - run: pip-audit
-      # Use the repository root packageManager pin (pnpm@9.15.0) as the
-      # single source of truth; an explicit action version conflicts with it.
+      # Use the repository root packageManager pin as the source of truth.
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-      # Resolve the patched graph first; the lockfile must be regenerated and committed
-      # with these manifest updates before restoring frozen-lockfile enforcement.
-      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm install --frozen-lockfile
       - run: pnpm audit --prod --audit-level high
