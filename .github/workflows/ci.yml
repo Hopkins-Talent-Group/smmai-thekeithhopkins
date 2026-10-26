@@ -39,7 +39,7 @@ jobs:
         run: |
           set -euo pipefail
           mapfile -t files < <(
-            git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" -- nextjs-setup/nextjs-dashboard |
+            git -C "$GITHUB_WORKSPACE" diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" -- nextjs-setup/nextjs-dashboard |
               sed 's#^nextjs-setup/nextjs-dashboard/##' |
               grep -E "[.](c|m)?[jt]sx?$" || true
           )
@@ -64,7 +64,7 @@ jobs:
             BASE_SHA="$BEFORE_SHA"
           fi
           mapfile -t files < <(
-            git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" -- nextjs-setup/nextjs-dashboard |
+            git -C "$GITHUB_WORKSPACE" diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" -- nextjs-setup/nextjs-dashboard |
               sed 's#^nextjs-setup/nextjs-dashboard/##' |
               grep -E "[.](c|m)?[jt]sx?$" || true
           )
