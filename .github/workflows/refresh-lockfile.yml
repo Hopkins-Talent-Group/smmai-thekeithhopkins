@@ -1,0 +1,35 @@
+name: Refresh pnpm lockfile (temporary)
+
+on:
+  pull_request:
+    branches: [vitrixlab/dev]
+    paths:
+      - package.json
+      - nextjs-setup/nextjs-dashboard/package.json
+      - pnpm-lock.yaml
+      - .github/workflows/refresh-lockfile.yml
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Regenerate lockfile from manifests
+        run: pnpm install --no-frozen-lockfile
+      - name: Upload regenerated lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: regenerated-pnpm-lockfile
+          path: pnpm-lock.yaml
+          if-no-files-found: error
+          retention-days: 1
