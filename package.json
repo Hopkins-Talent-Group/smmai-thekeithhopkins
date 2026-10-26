@@ -2,13 +2,27 @@
   "name": "social-media-smm-automation",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@9.15.0",
   "scripts": {
     "dev": "pnpm --dir nextjs-setup/nextjs-dashboard dev",
     "build": "pnpm --dir nextjs-setup/nextjs-dashboard build",
     "start": "pnpm --dir nextjs-setup/nextjs-dashboard start",
     "start:legacy": "serve -s ."
   },
-  "dependencies": {
-    "serve": "^14.2.4"
+  "pnpm.workspace.path": [
+    "nextjs-setup/nextjs-dashboard"
+  ],
+  "devDependencies": {
+    "@prisma/adapter-neon": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "prisma": "7.10.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "deepmerge-ts": "^8.0.0",
+      "mysql2": "^3.22.0",
+      "source-map-js": "^1.2.2",
+      "sharp": "^0.35.5"
+    }
   }
 }

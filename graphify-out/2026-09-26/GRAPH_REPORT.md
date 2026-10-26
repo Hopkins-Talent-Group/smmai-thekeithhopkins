@@ -1,17 +1,17 @@
 # Graph Report - smma  (2026-09-26)
 
 ## Corpus Check
-- 102 files · ~67,906 words
+- 104 files · ~68,578 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 9 file(s) not represented in the graph (top: (none) 3, .css 2, .example 1)
 
 ## Summary
-- 891 nodes · 1040 edges · 83 communities (64 shown, 19 thin omitted)
+- 895 nodes · 1056 edges · 73 communities (54 shown, 19 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 77 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `94176f62`
+- Built from commit: `a7630b9a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -32,7 +32,6 @@
 - lib.rs
 - eslint.config.mjs
 - postcss.config.mjs
-- react
 - app/page.tsx
 - __init__.py
 - smm-wasm
@@ -51,21 +50,16 @@
 - AGENTS.md
 - DESIGN.md — S M M A I Brand Direction
 - Phase 3: TikTok + YouTube
-- ApprovalQueue.tsx
 - Decorative Elements
 - Phase 2: LinkedIn + X
-- Visual & Color
+- antislop-ui
 - Group 3: Quality Locks (consistency)
 - Component specs
-- SecuritySection.tsx
 - Group 3: Quality Locks (consistency)
-- Layout & Components
-- DashboardShell.tsx
 - Pattern: Scroll Reveal (IntersectionObserver, Zero Dependencies)
 - Pattern: Typography System (Tokens, Eyebrow, Wordmark, Hierarchy)
 - antislop
 - Part 1: AI Slop Patterns (Warning Signs)
-- ArchCard.tsx
 - Social Media SMM Automation
 - antislop
 - Part 1: AI Slop Patterns (Warning Signs)
@@ -74,13 +68,10 @@
 - Pattern: Hero Dashboard Card (CSS 3D Focal Point)
 - Pattern: Highlights Strip (Real Metrics, No Invented Deltas)
 - Pattern: Storytelling Pairs (Feature + Visual, Alternating)
-- App & Dashboard
 - Analytics Dashboard UI
-- antislop-ui
 - The Craftsmanship Standard
 - The Craftsmanship Standard
 - Pattern Library Index
-- Motion
 - Delivery Gate (Mandatory)
 - MVP Implementation
 - drafts/route.ts
@@ -89,14 +80,13 @@
 - nextjs-dashboard/README.md
 - brand/route.ts
 - Part 3: Liveliness Toolkit
-- Structural & Flow
 - login/route.ts
 - nextjs-dashboard/AGENTS.md
 
 ## God Nodes (most connected - your core abstractions)
 1. `ContentDraft` - 25 edges
 2. `BrandProfile` - 22 edges
-3. `react` - 19 edges
+3. `react` - 21 edges
 4. `Group 1: Hard Gate (absolute, no exceptions)` - 18 edges
 5. `Group 1: Hard Gate (absolute, no exceptions)` - 18 edges
 6. `compilerOptions` - 16 edges
@@ -120,7 +110,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (83 total, 19 thin omitted)
+## Communities (73 total, 19 thin omitted)
 
 ### Community 0 - "test_imports.py"
 Cohesion: 0.05
@@ -170,13 +160,9 @@ Nodes (3): buildCommand, framework, outputDirectory
 Cohesion: 0.83
 Nodes (3): get_settings(), Settings, test_config_import()
 
-### Community 16 - "react"
-Cohesion: 0.22
-Nodes (5): LoginPage(), SiteNav(), BtnProps, Variant, react
-
 ### Community 17 - "app/page.tsx"
-Cohesion: 0.20
-Nodes (8): Home(), ClientManagement(), DashboardCard(), CtaBand(), HeroSection(), highlights, HighlightsStrip(), useScrollReveal()
+Cohesion: 0.10
+Nodes (19): Home(), DashboardCard(), ArchitectureSection(), layers, CtaBand(), HeroSection(), highlights, HighlightsStrip() (+11 more)
 
 ### Community 25 - "Python to WebAssembly Migration Plan"
 Cohesion: 0.07
@@ -207,8 +193,8 @@ Cohesion: 0.12
 Nodes (15): Adaptation guide, Adaptation guide, Adaptation guide, CSS, CSS, CSS, HTML, HTML (+7 more)
 
 ### Community 32 - "dashboard/page.tsx"
-Cohesion: 0.19
-Nodes (7): AnalyticsCards(), AutomationStatusCard(), BrandProfileCard(), GraphData, GraphExplorer(), PhaseInfo, PhaseProgress
+Cohesion: 0.07
+Nodes (25): LoginPage(), AnalyticsCards(), ApprovalQueue(), ApprovalQueueProps, AutomationStatusCard(), BrandProfileCard(), ContentDraftCard(), ContentDraftCardProps (+17 more)
 
 ### Community 33 - "Group 2: Purpose-Gate (technique allowed, purpose required)"
 Cohesion: 0.15
@@ -230,10 +216,6 @@ Nodes (11): Antislop Constraints Active, Brand Identity, DESIGN.md — S M M A I
 Cohesion: 0.17
 Nodes (11): Adapter Requirements, Cross-Platform Considerations, Goals, Migration from Phase 2, Overview, Phase 3: TikTok + YouTube, Risks and Constraints, Success Criteria (+3 more)
 
-### Community 38 - "ApprovalQueue.tsx"
-Cohesion: 0.20
-Nodes (6): ApprovalQueue(), ApprovalQueueProps, ContentDraftCard(), ContentDraftCardProps, StatusPill(), StatusPillProps
-
 ### Community 39 - "Decorative Elements"
 Cohesion: 0.17
 Nodes (12): AI Capsule Badges, Colored Left Stripe, Decorative Elements, Decorative Status Dot, Emoji as Decoration, Eyebrow Badge Above the Headline, Fake Terminal Window, Generic AI Icons (+4 more)
@@ -242,9 +224,9 @@ Nodes (12): AI Capsule Badges, Colored Left Stripe, Decorative Elements, Decorat
 Cohesion: 0.18
 Nodes (10): Adapter Requirements, Cross-Platform Planning, Goals, LinkedIn Adapter, Migration from Phase 1, Overview, Phase 2: LinkedIn + X, Risks and Constraints (+2 more)
 
-### Community 41 - "Visual & Color"
-Cohesion: 0.18
-Nodes (11): Background Grid, Dark Mode Default for No Reason, Excessive Accent Color, Excessive Border Radius, Excessive Glassmorphism, Generic Blue-Purple Gradient, Glow Everywhere, Overly Soft Shadows (+3 more)
+### Community 41 - "antislop-ui"
+Cohesion: 0.04
+Nodes (45): 4-Column Template Footer, antislop-ui, App & Dashboard, Background Grid, Bento Grid, Charts Without a Question, Copy-Paste Feature Cards, CSS Animation and JS Transform Conflict (+37 more)
 
 ### Community 42 - "Group 3: Quality Locks (consistency)"
 Cohesion: 0.20
@@ -254,21 +236,9 @@ Nodes (10): Group 3: Quality Locks (consistency), R-05 — Layout & Page Structu
 Cohesion: 0.20
 Nodes (9): Bar chart card, Card shell, Category / device breakdown list, Component specs, Layout grid, Line / area chart card, Metric (KPI) card, Pagination control (+1 more)
 
-### Community 44 - "SecuritySection.tsx"
-Cohesion: 0.24
-Nodes (7): phases, RoadmapSection(), securityCards, SecuritySection(), BadgeVariant, PhaseBadge(), PhaseBadgeProps
-
 ### Community 45 - "Group 3: Quality Locks (consistency)"
 Cohesion: 0.20
 Nodes (10): Group 3: Quality Locks (consistency), R-05 — Layout & Page Structure, R-11 — Border Radius, R-15 — CTA (Call to Action), R-16 — Copywriting & Buzzwords, R-20 — Visual Identity, R-21 — Dark Mode, R-29 — Color Palette (+2 more)
-
-### Community 46 - "Layout & Components"
-Cohesion: 0.20
-Nodes (10): 4-Column Template Footer, Bento Grid, Copy-Paste Feature Cards, "How It Works" Always 3 Steps, Layout & Components, Monotonous Template Layout, "Most Popular" Pricing Card, "Trusted By" Logo Bar (+2 more)
-
-### Community 47 - "DashboardShell.tsx"
-Cohesion: 0.31
-Nodes (6): DashboardShell(), DashboardShellProps, DashboardViewSection, LayoutControlBar(), LayoutControlBarProps, SiteFooter()
 
 ### Community 48 - "Pattern: Scroll Reveal (IntersectionObserver, Zero Dependencies)"
 Cohesion: 0.22
@@ -285,10 +255,6 @@ Nodes (7): antislop, Core Principle, First-Run Install Wizard, Functional Patter
 ### Community 51 - "Part 1: AI Slop Patterns (Warning Signs)"
 Cohesion: 0.25
 Nodes (8): Accessibility, Copywriting & Content, Decorative Elements, Functionality & Content, Identity & Originality, Layout & Components, Part 1: AI Slop Patterns (Warning Signs), Visual & Color
-
-### Community 52 - "ArchCard.tsx"
-Cohesion: 0.32
-Nodes (5): ArchitectureSection(), layers, WorkflowSection(), ArchCard(), ArchCardProps
 
 ### Community 53 - "Social Media SMM Automation"
 Cohesion: 0.25
@@ -322,17 +288,9 @@ Nodes (7): Checklist before shipping, Content guidance, CSS, HTML, Pattern: High
 Cohesion: 0.25
 Nodes (7): Checklist before shipping, Content guidance, CSS, HTML, Pattern: Storytelling Pairs (Feature + Visual, Alternating), Structure, When to use this pattern
 
-### Community 61 - "App & Dashboard"
-Cohesion: 0.25
-Nodes (8): App & Dashboard, Charts Without a Question, Default Dashboard Shell, Filler Activity Feed, Filler Data in Fields and Columns, Generic Table Columns, Placeholder Empty and Loading States, Stat Cards With Invented Numbers
-
 ### Community 62 - "Analytics Dashboard UI"
 Cohesion: 0.29
 Nodes (6): Analytics Dashboard UI, Before building anything, Components covered, Core rules (what makes this "precise" instead of ad hoc), When to use this skill, Workflow
-
-### Community 63 - "antislop-ui"
-Cohesion: 0.29
-Nodes (6): antislop-ui, Hero Section: 3D Focal Point Without WebGL, How to use this skill, Scroll Reveal: IntersectionObserver Pattern, UI Skill Checklist, WCAG Contrast: Muted Text on Deep Backgrounds
 
 ### Community 64 - "The Craftsmanship Standard"
 Cohesion: 0.33
@@ -345,10 +303,6 @@ Nodes (6): C-1 — Intentionality, C-2 — Functional Completeness, C-3 — Cont
 ### Community 66 - "Pattern Library Index"
 Cohesion: 0.33
 Nodes (6): Full landing page section order (proven), Glow budget for this structure (R-13, max 2 elements), Motion inventory (R-19 — all guarded by prefers-reduced-motion), Pattern Library Index, Patterns, WCAG contrast reference (dark mode)
-
-### Community 67 - "Motion"
-Cohesion: 0.33
-Nodes (6): CSS Animation and JS Transform Conflict, Endless Pulses and Loops, JS Tilt Without Device Guard, Missing Reduced-Motion Guard, Motion, Template Animations Stacked
 
 ### Community 68 - "Delivery Gate (Mandatory)"
 Cohesion: 0.40
@@ -374,19 +328,15 @@ Nodes (3): Deploy on Vercel, Getting Started, Learn More
 Cohesion: 0.50
 Nodes (4): Design Read (how the dials are set), Levers (how the dials become visual decisions), Part 3: Liveliness Toolkit, Three Dials (required)
 
-### Community 77 - "Structural & Flow"
-Cohesion: 0.50
-Nodes (4): Dead Navigation, Non-Functional Controls, Sections That Fill a Template, Structural & Flow
-
 ## Knowledge Gaps
 - **534 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+529 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 606 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 608 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **19 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `react` to `dashboard/page.tsx`, `nextjs-dashboard/package.json`, `ApprovalQueue.tsx`, `DashboardShell.tsx`, `app/page.tsx`, `ArchCard.tsx`?**
+- **Why does `react` connect `dashboard/page.tsx` to `nextjs-dashboard/package.json`, `app/page.tsx`?**
   _High betweenness centrality (0.012) - this node is a cross-community bridge._
 - **Why does `AnalyticsSnapshot` connect `AnalyticsSnapshot` to `test_imports.py`?**
   _High betweenness centrality (0.005) - this node is a cross-community bridge._

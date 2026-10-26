@@ -94,7 +94,24 @@
         /* ─── Layout ─────────────────────────────────────────────────────────────── */
         .wrap { max-width: 420px; margin: 3rem auto; padding: 0 2rem }
 
-        /* ─── Form styles ───────────────────────────────────────────────────────── */
+        /* ─── Skip link ─────────────────────────────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -999px;
+  left: -999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.skip-link:focus {
+  top: .75rem;
+  left: .75rem;
+  width: auto;
+  height: auto;
+  overflow: visible;
+}
+
+/* ─── Form styles ───────────────────────────────────────────────────────── */
         .card {
             background: var(--panel);
             border: 1px solid var(--line);
@@ -106,17 +123,16 @@
 
         .form-group label { display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: var(--text-sm) }
 
-        .form-group input {
-            width: 100%; padding: 0.75rem; background: var(--surface);
-            border: 1px solid var(--line); border-radius: var(--radius-medium);
-            color: var(--text); font-size: var(--text-base); font-family: var(--font)
-        }
-
-        .form-group input:focus { outline: none; border-color: var(--primary) }
+.form-group input {
+  width: 100%; padding: 0.75rem; background: var(--surface);
+  border: 1px solid var(--muted); border-radius: var(--radius-medium);
+  color: var(--text); font-size: var(--text-base); font-family: var(--font)
+}
+.form-group input:focus { outline: 2px solid var(--primary); outline-offset: 4px }
 
         .btn {
             width: 100%; padding: 0.75rem; background: var(--primary);
-            color: white; border: none; border-radius: var(--radius-medium);
+            color: var(--bg); border: none; border-radius: var(--radius-medium);
             font-size: var(--text-md); font-weight: var(--weight-bold); cursor: pointer;
             margin-top: 0.5rem; transition: background .2s ease
         }
@@ -149,11 +165,24 @@
 <!-- ─── Skip link ─────────────────────────────────────────────────────────────── -->
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
-<div class="wrap">
-    <div class="card">
-        <h2 style="margin-top: 0; margin-bottom: 1.5rem">Sign in to SMMAI</h2>
+<header class="login-header" aria-label="Login page header">
+    <div class="wrap">
+        <a class="logo" href="index.html" aria-label="SMMAI home">S M M <span class="ai">AI</span></a>
+    </div>
+</header>
 
-        <form id="loginForm" novalidate>
+<main id="main-content">
+    <div class="wrap">
+        <div class="card">
+        <h1 style="margin-top: 0; margin-bottom: 1.5rem">Sign in to SMMAI</h1>
+
+<div style="display:flex;justify-content:flex-end;margin-bottom:1.5rem">
+    <button class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+        <span class="theme-icon" aria-hidden="true">☾</span>
+    </button>
+</div>
+
+        <form id="loginForm" novalidate onsubmit="event.preventDefault(); alert('Form submitted');">
             <div class="form-group">
                 <label for="loginEmail">Email</label>
                 <input type="email" id="loginEmail" name="email" required placeholder="you@company.com">
@@ -166,36 +195,30 @@
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem">
                 <button type="submit" class="btn">Sign in</button>
-                <a class="btn-secondary" href="#">Forgot password?</a>
-            </div>
-
-            <div class="links">
-                <a href="#">Create free account</a>
+                <div style="display: inline-flex; gap: 0.5rem">
+                    <a style="color: var(--muted); text-decoration: none;" href="#">Forgot password?</a>
+                    <a style="color: var(--muted); text-decoration: none;" href="#">Create free account</a>
+                </div>
             </div>
         </form>
     </div>
-</div>
+</main>
 
 <script>
-    // ─── Login form interactivity ────────────────────────────────────────
+    // ─── Theme toggle — localStorage persistence (DESIGN.md R-21, antislop R-34) ────────────────────
     (function() {
-        var loginForm = document.getElementById('loginForm');
-
-        if (!loginForm) return;
-
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            var email = document.getElementById('loginEmail').value;
-            var password = document.getElementById('loginPassword').value;
-
-            // Test credentials: admin / admin
-            if (email.trim() === 'admin@smmai.com' && password.trim() === 'admin') {
-                // Redirect to dashboard (main index with workflow section)
-                window.location.href = 'index.html#workflow';
-            } else {
-                alert('Invalid credentials. Use: admin / admin');
-            }
-        });
+      var btn = document.querySelector('.theme-toggle');
+      var icon = btn.querySelector('.theme-icon');
+      var saved = localStorage.getItem('smma-theme');
+      if (saved === 'light') {
+        document.documentElement.classList.add('light');
+        icon.textContent = '☀';
+      }
+      btn.addEventListener('click', function() {
+        var isLight = document.documentElement.classList.toggle('light');
+        icon.textContent = isLight ? '☀' : '☾';
+        localStorage.setItem('smma-theme', isLight ? 'light' : 'dark');
+      });
     })();
 </script>
 

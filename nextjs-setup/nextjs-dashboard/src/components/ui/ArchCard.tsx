@@ -59,8 +59,6 @@ export default function ArchCard({
     <article
       ref={cardRef}
       className={`card ${className}`.trim()}
-      tabIndex={0}
-      role="article"
       aria-label={ariaLabel}
       data-reveal
       data-delay={revealDelay ?? undefined}

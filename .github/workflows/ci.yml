@@ -2,11 +2,86 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
 
 jobs:
   test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - run: pytest -q
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dashboard dependencies
+        working-directory: nextjs-setup/nextjs-dashboard
+        run: npm install --no-package-lock
+      - name: Build dashboard
+        working-directory: nextjs-setup/nextjs-dashboard
+        env:
+          # Build-time-only placeholder; never used to connect to a database.
+          DATABASE_URL: postgresql://test:test@127.0.0.1:5432/test?sslmode=disable
+        run: npm run build
+      - name: Lint changed dashboard files (blocking)
+        if: github.event_name == 'pull_request'
+        working-directory: nextjs-setup/nextjs-dashboard
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(
+            git -C "$GITHUB_WORKSPACE" diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" -- nextjs-setup/nextjs-dashboard |
+              sed 's#^nextjs-setup/nextjs-dashboard/##' |
+              grep -E "[.](c|m)?[jt]sx?$" || true
+          )
+          if ((${#files[@]} == 0)); then
+            echo "No changed dashboard source files require ESLint."
+            exit 0
+          fi
+          printf 'Linting changed files:\n'
+          printf ' - %s\n' "${files[@]}"
+          npx eslint --no-warn-ignored "${files[@]}"
+      - name: Lint changed dashboard files (blocking, push)
+        if: github.event_name == 'push'
+        working-directory: nextjs-setup/nextjs-dashboard
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$BEFORE_SHA" =~ ^0+$ ]]; then
+            BASE_SHA="$(git rev-parse "$HEAD_SHA^")"
+          else
+            BASE_SHA="$BEFORE_SHA"
+          fi
+          mapfile -t files < <(
+            git -C "$GITHUB_WORKSPACE" diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" -- nextjs-setup/nextjs-dashboard |
+              sed 's#^nextjs-setup/nextjs-dashboard/##' |
+              grep -E "[.](c|m)?[jt]sx?$" || true
+          )
+          if ((${#files[@]} == 0)); then
+            echo "No changed dashboard source files require ESLint."
+            exit 0
+          fi
+          printf 'Linting changed files:\n'
+          printf ' - %s\n' "${files[@]}"
+          npx eslint --no-warn-ignored "${files[@]}"
+      - name: Repository-wide dashboard lint (advisory baseline)
+        working-directory: nextjs-setup/nextjs-dashboard
+        continue-on-error: true
+        run: npm run lint
+
+  ruff-advisory:
+    name: Ruff (advisory; existing baseline debt)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,5 +90,7 @@ jobs:
           python-version: "3.11"
       - run: python -m pip install --upgrade pip
       - run: pip install -e ".[dev]"
-      - run: ruff check .
-      - run: pytest -q
+      - name: Report repository-wide Ruff findings (non-blocking)
+        id: ruff
+        continue-on-error: true
+        run: ruff check .

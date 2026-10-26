@@ -1,0 +1,55 @@
+name: Durable publish queue integration
+
+on:
+  push:
+    branches:
+      - fix/pr1-durable-publish-retries-v2
+  pull_request:
+    branches:
+      - dev
+      - main
+  workflow_dispatch:
+
+jobs:
+  queue-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      REDIS_URL: redis://127.0.0.1:6379
+      QUEUE_IT: "1"
+      QUEUE_LEASE_MS: "1000"
+      QUEUE_BACKOFF_BASE_MS: "10"
+      DRY_RUN: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dashboard dependencies
+        working-directory: nextjs-setup/nextjs-dashboard
+        run: npm install --no-package-lock
+      - name: Real Redis queue integration tests
+        working-directory: nextjs-setup/nextjs-dashboard
+        run: npm run test:queue
+      - name: Type check dashboard
+        working-directory: nextjs-setup/nextjs-dashboard
+        run: npx tsc --noEmit
+      - name: Lint changed queue files
+        working-directory: nextjs-setup/nextjs-dashboard
+        run: npx eslint src/lib/queue.ts scripts/reconcile-legacy-publish-queue.ts tests/queue.integration.test.ts
+      - name: Build dashboard
+        working-directory: nextjs-setup/nextjs-dashboard
+        env:
+          # Build-time-only placeholder; never used to connect to a database.
+          DATABASE_URL: postgresql://test:test@127.0.0.1:5432/test?sslmode=disable
+        run: npm run build

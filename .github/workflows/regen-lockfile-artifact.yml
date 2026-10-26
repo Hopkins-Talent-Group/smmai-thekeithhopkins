@@ -1,0 +1,58 @@
+name: Repair pnpm lockfile configuration
+
+on:
+  push:
+    branches:
+      - fix/pr1-durable-publish-retries-v2
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pnpm-lock-repair-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/pr1-durable-publish-retries-v2
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Regenerate lockfile without lifecycle scripts
+        run: pnpm install --lockfile-only --ignore-scripts --no-frozen-lockfile
+      - name: Verify frozen installation
+        run: pnpm install --frozen-lockfile
+      - name: Review lockfile change scope
+        run: |
+          git diff --check
+          git diff --stat -- pnpm-lock.yaml
+          git diff -- pnpm-lock.yaml
+      - name: Commit regenerated lockfile
+        run: |
+          if git diff --quiet -- pnpm-lock.yaml; then
+            echo "Lockfile is already synchronized; no commit needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git commit -m "fix: synchronize pnpm lockfile overrides [skip ci]"
+          git push origin HEAD:fix/pr1-durable-publish-retries-v2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pnpm-lock-repair-result
+          path: pnpm-lock.yaml
+          if-no-files-found: warn
+          retention-days: 2

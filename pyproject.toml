@@ -27,3 +27,5 @@ where = ["src"]
 
 [tool.vercel]
 entrypoint = "smm.main:app"
+[project.scripts]
+smm = "smm.cli:main"

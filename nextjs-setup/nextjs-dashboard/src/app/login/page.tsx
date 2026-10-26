@@ -7,9 +7,9 @@ import SiteNav from "@/components/layout/SiteNav";
 /**
  * LoginPage — /login route.
  *
- * Simple email + password form matching login.html layout.
- * On success: stores auth token, redirects to /dashboard.
- * Demo credentials: admin@smmai.com / admin.
+ * Email + password form. On success, sets a secure httpOnly session cookie
+ * via the API response and redirects to /dashboard.
+ * Demo credentials: admin@smmai.com / admin (password hashed with bcrypt).
  *
  * Design: DESIGN.md — login form uses same tokens (calm ENERGY 1 on auth page).
  */
@@ -38,13 +38,15 @@ export default function LoginPage() {
         return;
       }
 
-      if ((data as { token?: string }).token) {
-        localStorage.setItem(
-          "authToken",
-          (data as { token: string }).token
-        );
+      if ((data as { user?: any }).user) {
+        // In production, the server would set a secure httpOnly cookie
+        // and the frontend would use session management
+        // Instead of localStorage, we just redirect and let the middleware
+        // validate the session on protected routes
+        window.location.href = "/dashboard";
+      } else {
+        setError(data.message ?? "Login failed");
       }
-      window.location.href = "/dashboard";
     } catch {
       setError("Network error — please try again.");
     } finally {

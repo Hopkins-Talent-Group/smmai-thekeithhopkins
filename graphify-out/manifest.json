@@ -12,9 +12,9 @@
     "semantic_hash": ""
   },
   "nextjs-setup/nextjs-dashboard/package.json": {
-    "mtime": 1790264232.2765896,
-    "seen": 1790361056.4633882,
-    "ast_hash": "874fca49022695b870435f35b6e217e7",
+    "mtime": 1790369312.7496955,
+    "seen": 1790372962.4785483,
+    "ast_hash": "a6edf5eda125a06a488c58be5835b38b",
     "semantic_hash": ""
   },
   "nextjs-setup/nextjs-dashboard/postcss.config.mjs": {
@@ -24,8 +24,8 @@
     "semantic_hash": "239f3ebf717465dc636818a1a619398d"
   },
   "nextjs-setup/nextjs-dashboard/src/app/dashboard/page.tsx": {
-    "mtime": 1790366826.8954418,
-    "seen": 1790366854.896711,
+    "mtime": 1790369312.8837087,
+    "seen": 1790372962.478568,
     "ast_hash": "1349240c8e53118df085cf0eacb277fa",
     "semantic_hash": ""
   },
@@ -245,12 +245,6 @@
     "ast_hash": "54041d90b9f0575b7d85a3d616134502",
     "semantic_hash": "54041d90b9f0575b7d85a3d616134502"
   },
-  ".ox/settings.local.json": {
-    "mtime": 1790264232.0755868,
-    "seen": 1790361056.4633563,
-    "ast_hash": "ff1b869927489812d67534e3e2d1090f",
-    "semantic_hash": ""
-  },
   "nextjs-setup/nextjs-dashboard/src/app/api/auth/login/route.ts": {
     "mtime": 1790264232.2835898,
     "seen": 1790361056.4633958,
@@ -324,8 +318,8 @@
     "semantic_hash": ""
   },
   "nextjs-setup/nextjs-dashboard/src/components/layout/DashboardShell.tsx": {
-    "mtime": 1790366748.0085206,
-    "seen": 1790366854.8967903,
+    "mtime": 1790369312.885709,
+    "seen": 1790372962.4786086,
     "ast_hash": "07b201a10c2aac58b4747cec0e27d017",
     "semantic_hash": ""
   },
@@ -360,8 +354,8 @@
     "semantic_hash": ""
   },
   "nextjs-setup/nextjs-dashboard/src/components/sections/HeroSection.tsx": {
-    "mtime": 1790264232.3275905,
-    "seen": 1790361056.4634535,
+    "mtime": 1790369312.886709,
+    "seen": 1790372962.4786265,
     "ast_hash": "85a9b2c11a69d8c0f1923812b2d6829d",
     "semantic_hash": ""
   },
@@ -384,8 +378,8 @@
     "semantic_hash": ""
   },
   "nextjs-setup/nextjs-dashboard/src/components/sections/WorkflowSection.tsx": {
-    "mtime": 1790264232.3325906,
-    "seen": 1790361056.4634619,
+    "mtime": 1790369312.886709,
+    "seen": 1790372962.478638,
     "ast_hash": "b8563c28ae7164eb692f4b7eff56a527",
     "semantic_hash": ""
   },
@@ -438,14 +432,14 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1790264232.076587,
-    "seen": 1790361056.4636066,
+    "mtime": 1790369312.7977004,
+    "seen": 1790372962.4787433,
     "ast_hash": "8d49590257eee513628cb066f3f0a4b1",
     "semantic_hash": ""
   },
   "DESIGN.md": {
-    "mtime": 1790264232.080587,
-    "seen": 1790361056.4636085,
+    "mtime": 1790369312.8027008,
+    "seen": 1790372962.478746,
     "ast_hash": "8f0dac30f99f75409e9d540cb40b7d21",
     "semantic_hash": ""
   },
@@ -678,15 +672,21 @@
     "semantic_hash": ""
   },
   "nextjs-setup/nextjs-dashboard/src/components/crm/CRMDashboard.tsx": {
-    "mtime": 1790366793.1627758,
-    "seen": 1790366854.8967648,
-    "ast_hash": "58cf5bd05c037c71451568cec7132eee",
+    "mtime": 1790372733.703703,
+    "seen": 1790372962.4785912,
+    "ast_hash": "bdc99ccfaf290a87d4aa63695f0eb3f4",
     "semantic_hash": ""
   },
   "nextjs-setup/nextjs-dashboard/src/components/layout/DashboardHeader.tsx": {
-    "mtime": 1790365819.6970923,
-    "seen": 1790366854.896786,
+    "mtime": 1790369312.884709,
+    "seen": 1790372962.4786055,
     "ast_hash": "e74b1d6ea7d21e5bd40c04d917de327a",
+    "semantic_hash": ""
+  },
+  "nextjs-setup/nextjs-dashboard/next-env.d.ts": {
+    "mtime": 1790369312.7486954,
+    "seen": 1790372962.4785354,
+    "ast_hash": "c7b887684e81cfa5830eeeb7286485f6",
     "semantic_hash": ""
   }
 }

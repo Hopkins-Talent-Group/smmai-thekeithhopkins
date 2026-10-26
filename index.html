@@ -115,7 +115,17 @@ strong, b { font-weight: var(--weight-semibold) }
   transition: top .15s ease;
 }
 .skip-link:focus { top: .75rem }
-
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 /* ─── Layout ─────────────────────────────────────────────────────────────── */
 .wrap { max-width: 1120px; margin: auto; padding: 0 24px }
 
@@ -139,6 +149,29 @@ html.light nav { background: rgba(248,250,249,0.94) }
   justify-content: space-between;
   height: 100%;
   gap: 1.5rem;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: .25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: .5rem;
+}
+.hamburger span {
+  width: 24px;
+  height: 2px;
+  background: var(--muted);
+  transition: transform .3s ease, opacity .3s ease;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg) }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg) }
+@media (max-width: 400px) {
+  .hamburger { display: flex }
+  .nav-links { position: relative; }
+  .nav-links.open { display: flex }
 }
 
 /* S M M AI wordmark — spaced-letter identity mark (R-06, R-01) */
@@ -1069,25 +1102,38 @@ html.light nav { background: rgba(248,250,249,0.94) }
   .cta-band { padding: 5rem 0 }
 }
 @media (max-width: 400px) {
-  .nav-links .link:not(.active) { display: none }
-  .highlights-inner { grid-template-columns: 1fr }
+  .nav-links { position: absolute; top: 100%; left: 0; right: 0; background: rgba(7,12,9,0.95); flex-direction: column; padding: 1rem; display: none }
+  .nav-links.open { display: flex }
+  .nav-links .link { width: 100%; box-sizing: border-box }
+  .nav-links .link.active { }
 }
 </style>
 </head>
-<body>
 
+<body>
+  <noscript>
+    <style>
+      [data-reveal] { opacity: 1 !important; transform: none !important; transition: none !important }
+    </style>
+  </noscript>
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
 <header>
   <nav aria-label="Main navigation">
     <div class="wrap nav-inner">
       <a class="logo" href="#" aria-label="SMMAI home">S M M <span class="ai">AI</span></a>
-<div class="nav-links">
+      <button class="hamburger" aria-label="Open navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links">
         <a class="link active" href="#workflow">How it works</a>
         <a class="link" href="#architecture">Architecture</a>
         <a class="link" href="#security">Security</a>
         <a class="link" href="#roadmap">Roadmap</a>
         <a class="link" href="login.html">Login</a>
+        <a class="github-badge" href="https://github.com/vitrixLab/social-media-smm-automation" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
       <button class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
         <span class="theme-icon" aria-hidden="true">☾</span>
@@ -1096,8 +1142,7 @@ html.light nav { background: rgba(248,250,249,0.94) }
   </nav>
 </header>
 
-<!-- Skip link for mobile navbar ─────────────────────────────────────────── -->
-<a class="skip-link" href="#main-content">Skip to main content</a>
+
 
 <main id="main-content">
 
@@ -1182,6 +1227,7 @@ html.light nav { background: rgba(248,250,249,0.94) }
         </div><!-- /.dashboard-card -->
       </div><!-- /.dash-float-wrap -->
     </div><!-- /.hero-visual -->
+      <p class="sr-only">28 posts this week. 100% human-reviewed. 0 bypassed gate.</p>
 
   </div><!-- /.hero-inner -->
 </section>
@@ -1338,7 +1384,7 @@ html.light nav { background: rgba(248,250,249,0.94) }
 
   <div class="arch-grid">
     <!-- ── 01 · Foundation ─────────────────────────────────────────────── -->
-    <article class="card" tabindex="0" role="article" aria-label="Layer 01 — AI provider" data-reveal>
+    <article class="card" aria-label="Layer 01 — AI provider" data-reveal>
       <div class="border-glow-layer" aria-hidden="true"></div>
       <div class="border-glow-inner" aria-hidden="true"></div>
       <div class="card-body">
@@ -1350,7 +1396,7 @@ html.light nav { background: rgba(248,250,249,0.94) }
     </article>
 
     <!-- ── 02 · Guardrail ──────────────────────────────────────────────── -->
-    <article class="card" tabindex="0" role="article" aria-label="Layer 02 — Moderation" data-reveal data-delay="1">
+    <article class="card" aria-label="Layer 02 — Moderation" data-reveal data-delay="1">
       <div class="border-glow-layer" aria-hidden="true"></div>
       <div class="border-glow-inner" aria-hidden="true"></div>
       <div class="card-body">
@@ -1362,7 +1408,7 @@ html.light nav { background: rgba(248,250,249,0.94) }
     </article>
 
     <!-- ── 03 · Gate ───────────────────────────────────────────────────── -->
-    <article class="card" tabindex="0" role="article" aria-label="Layer 03 — Human approval" data-reveal data-delay="2">
+    <article class="card" aria-label="Layer 03 — Human approval" data-reveal data-delay="2">
       <div class="border-glow-layer" aria-hidden="true"></div>
       <div class="border-glow-inner" aria-hidden="true"></div>
       <div class="card-body">
@@ -1374,7 +1420,7 @@ html.light nav { background: rgba(248,250,249,0.94) }
     </article>
 
     <!-- ── 04 · Translation ────────────────────────────────────────────── -->
-    <article class="card" tabindex="0" role="article" aria-label="Layer 04 — Platform adapters" data-reveal data-delay="1">
+    <article class="card" aria-label="Layer 04 — Platform adapters" data-reveal data-delay="1">
       <div class="border-glow-layer" aria-hidden="true"></div>
       <div class="border-glow-inner" aria-hidden="true"></div>
       <div class="card-body">
@@ -1386,7 +1432,7 @@ html.light nav { background: rgba(248,250,249,0.94) }
     </article>
 
     <!-- ── 05 · Timing ─────────────────────────────────────────────────── -->
-    <article class="card" tabindex="0" role="article" aria-label="Layer 05 — Scheduling" data-reveal data-delay="2">
+    <article class="card" aria-label="Layer 05 — Scheduling" data-reveal data-delay="2">
       <div class="border-glow-layer" aria-hidden="true"></div>
       <div class="border-glow-inner" aria-hidden="true"></div>
       <div class="card-body">
@@ -1398,7 +1444,7 @@ html.light nav { background: rgba(248,250,249,0.94) }
     </article>
 
     <!-- ── 06 · Loop ───────────────────────────────────────────────────── -->
-    <article class="card" tabindex="0" role="article" aria-label="Layer 06 — Analytics feedback" data-reveal data-delay="3">
+    <article class="card" aria-label="Layer 06 — Analytics feedback" data-reveal data-delay="3">
       <div class="border-glow-layer" aria-hidden="true"></div>
       <div class="border-glow-inner" aria-hidden="true"></div>
       <div class="card-body">
@@ -1421,32 +1467,32 @@ html.light nav { background: rgba(248,250,249,0.94) }
   </div>
 
   <div class="security-grid arch-grid">
-    <article class="card" tabindex="0" role="article" aria-label="Dry-run first" data-reveal style="grid-column: auto">
+    <article class="card" aria-label="Dry-run first" data-reveal style="grid-column: auto">
       <div class="border-glow-layer" aria-hidden="true"></div>
       <div class="border-glow-inner" aria-hidden="true"></div>
       <div class="title">Dry-run first</div>
       <p class="desc">Development and scheduled QA use <strong>DRY_RUN=true</strong>. The Meta adapter does not send live requests in dry-run mode.</p>
     </article>
 
-    <article class="card" tabindex="0" role="article" aria-label="Secrets stay out of source" data-reveal data-delay="1">
+    <article class="card" aria-label="Secrets stay out of source" data-reveal data-delay="1">
       <div class="border-glow-layer" aria-hidden="true"></div>
       <div class="border-glow-inner" aria-hidden="true"></div>
       <div class="title">Secrets stay out of source</div>
       <p class="desc">OAuth tokens, API keys and refresh tokens belong in environment variables and GitHub Secrets, not config files or commits.</p>
     </article>
 
-    <article class="card" tabindex="0" role="article" aria-label="Moderation before publish" data-reveal data-delay="2">
+    <article class="card" aria-label="Moderation before publish" data-reveal data-delay="2">
       <div class="border-glow-layer" aria-hidden="true"></div>
       <div class="border-glow-inner" aria-hidden="true"></div>
       <div class="title">Moderation before publish</div>
       <p class="desc">A failed policy check blocks publication. Empty content and missing required disclosures are rejected.</p>
     </article>
 
-    <article class="card" tabindex="0" role="article" aria-label="Explicit approval" data-reveal data-delay="3">
+    <article class="card" aria-label="Explicit approval" data-reveal data-delay="3">
       <div class="border-glow-layer" aria-hidden="true"></div>
       <div class="border-glow-inner" aria-hidden="true"></div>
       <div class="title">Explicit approval</div>
-      <p class="desc">The publishing service requires a human approval signal <span class="phase-badge completed">before a live publish can proceed</span>.</p>
+      <p class="desc">The publishing service requires a human approval signal before a live publish can proceed.</p>
     </article>
   </div>
 </section>
@@ -1632,52 +1678,20 @@ html.light nav { background: rgba(248,250,249,0.94) }
   });
 })();
 
-// ─── Login form interactivity ────────────────────────────────────────
+// ─── Mobile nav menu ───────────────────────────────────────────────────
 (function() {
-  var loginBtn = document.getElementById('loginBtn');
-  var loginSection = document.getElementById('login');
-  var loginForm = document.getElementById('loginForm');
+  var hamburger = document.querySelector('.hamburger');
+  var navLinks = document.querySelector('.nav-links');
 
-  if (!loginBtn || !loginSection || !loginForm) return;
+  if (!hamburger || !navLinks) return;
 
-  // Toggle login section visibility
-  loginBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    var isVisible = loginSection.style.display !== 'none';
-    loginSection.style.display = isVisible ? 'none' : 'block';
-    loginSection.style.width = '100%';
-    loginSection.style.maxWidth = '400px';
-    loginSection.style.margin = '2rem auto';
-
-    if (!isVisible) {
-      var emailInput = loginSection.querySelector('input[type="email"]');
-      if (emailInput) emailInput.focus();
-    }
+  hamburger.addEventListener('click', function() {
+    var isOpen = navLinks.classList.contains('open');
+    navLinks.classList.toggle('open', !isOpen);
+    this.setAttribute('aria-expanded', !isOpen);
   });
+})();
 
-  // Handle form submission
-  loginForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    var email = document.getElementById('loginEmail').value;
-    var password = document.getElementById('loginPassword').value;
-
-    if (email.trim() && password.trim()) {
-      loginSection.style.display = 'none';
-      loginBtn.textContent = 'Logout';
-      loginBtn.classList.remove('secondary');
-      loginBtn.classList.add('primary');
-      loginBtn.setAttribute('aria-label', 'Logout from dashboard');
-      window.location.hash = '#dashboard';
-    }
-  });
-
-  // Close login section on Escape key
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && loginSection.style.display !== 'none') {
-      loginSection.style.display = 'none';
-      loginBtn.focus();
-    }
-  });
 })();
 </script>
 

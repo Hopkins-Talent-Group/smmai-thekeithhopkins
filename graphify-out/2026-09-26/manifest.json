@@ -24,9 +24,9 @@
     "semantic_hash": "239f3ebf717465dc636818a1a619398d"
   },
   "nextjs-setup/nextjs-dashboard/src/app/dashboard/page.tsx": {
-    "mtime": 1790264232.2865899,
-    "seen": 1790361056.4634118,
-    "ast_hash": "65db9d94f1d4a838c7f3025170c330a4",
+    "mtime": 1790366826.8954418,
+    "seen": 1790366854.896711,
+    "ast_hash": "1349240c8e53118df085cf0eacb277fa",
     "semantic_hash": ""
   },
   "nextjs-setup/nextjs-dashboard/src/app/layout.tsx": {
@@ -42,9 +42,9 @@
     "semantic_hash": ""
   },
   "nextjs-setup/nextjs-dashboard/src/app/page.tsx": {
-    "mtime": 1790264232.30059,
-    "seen": 1790361056.4634213,
-    "ast_hash": "a67aeea537034fd19b40b67cf499e10f",
+    "mtime": 1790365797.6228611,
+    "seen": 1790366854.8967247,
+    "ast_hash": "817c1e5beadebe9d678c0a50b62b68d7",
     "semantic_hash": ""
   },
   "nextjs-setup/nextjs-dashboard/tsconfig.json": {
@@ -324,9 +324,9 @@
     "semantic_hash": ""
   },
   "nextjs-setup/nextjs-dashboard/src/components/layout/DashboardShell.tsx": {
-    "mtime": 1790264232.3245904,
-    "seen": 1790361056.4634411,
-    "ast_hash": "154db357b4f065a3104fdb675a3759f5",
+    "mtime": 1790366748.0085206,
+    "seen": 1790366854.8967903,
+    "ast_hash": "07b201a10c2aac58b4747cec0e27d017",
     "semantic_hash": ""
   },
   "nextjs-setup/nextjs-dashboard/src/components/layout/LayoutControlBar.tsx": {
@@ -675,6 +675,18 @@
     "mtime": 1790264232.2815897,
     "seen": 1790361056.4636917,
     "ast_hash": "a2760511c65806022ad20adf74370ff3",
+    "semantic_hash": ""
+  },
+  "nextjs-setup/nextjs-dashboard/src/components/crm/CRMDashboard.tsx": {
+    "mtime": 1790366793.1627758,
+    "seen": 1790366854.8967648,
+    "ast_hash": "58cf5bd05c037c71451568cec7132eee",
+    "semantic_hash": ""
+  },
+  "nextjs-setup/nextjs-dashboard/src/components/layout/DashboardHeader.tsx": {
+    "mtime": 1790365819.6970923,
+    "seen": 1790366854.896786,
+    "ast_hash": "e74b1d6ea7d21e5bd40c04d917de327a",
     "semantic_hash": ""
   }
 }

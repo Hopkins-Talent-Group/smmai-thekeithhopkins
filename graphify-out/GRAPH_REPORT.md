@@ -1,22 +1,22 @@
 # Graph Report - smma  (2026-09-26)
 
 ## Corpus Check
-- 104 files · ~68,578 words
+- 104 files · ~68,638 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 9 file(s) not represented in the graph (top: (none) 3, .css 2, .example 1)
+- Unclassified: 8 file(s) not represented in the graph (top: (none) 3, .css 2, .example 1)
 
 ## Summary
-- 895 nodes · 1056 edges · 73 communities (54 shown, 19 thin omitted)
+- 896 nodes · 1058 edges · 77 communities (58 shown, 19 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 77 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a7630b9a`
+- Built from commit: `bd0e50d3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- test_imports.py
+- ContentDraft
 - nextjs-dashboard/package.json
 - AnalyticsSnapshot
 - AI Automation Architecture for SMM
@@ -28,10 +28,11 @@
 - antislop-layoutmobile
 - vercel.json
 - get_settings
-- wasm/signals.py
+- Signal
 - lib.rs
 - eslint.config.mjs
 - postcss.config.mjs
+- test_imports.py
 - app/page.tsx
 - __init__.py
 - smm-wasm
@@ -50,12 +51,15 @@
 - AGENTS.md
 - DESIGN.md — S M M A I Brand Direction
 - Phase 3: TikTok + YouTube
+- ContentPlanner
 - Decorative Elements
 - Phase 2: LinkedIn + X
 - antislop-ui
 - Group 3: Quality Locks (consistency)
 - Component specs
+- BrandProfile
 - Group 3: Quality Locks (consistency)
+- next-env.d.ts
 - Pattern: Scroll Reveal (IntersectionObserver, Zero Dependencies)
 - Pattern: Typography System (Tokens, Eyebrow, Wordmark, Hierarchy)
 - antislop
@@ -96,29 +100,29 @@
 10. `Group 2: Purpose-Gate (technique allowed, purpose required)` - 13 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `test_analytics_snapshot_import()` --uses--> `AnalyticsSnapshot`  [INFERRED]
-  tests/test_imports.py → src/smm/domain/models.py
 - `test_generation_request_import()` --uses--> `GenerationRequest`  [INFERRED]
   tests/test_imports.py → src/smm/ai/provider.py
 - `test_generation_result_import()` --uses--> `GenerationResult`  [INFERRED]
   tests/test_imports.py → src/smm/ai/provider.py
 - `test_ai_provider_protocol_import()` --uses--> `AIProvider`  [INFERRED]
   tests/test_imports.py → src/smm/ai/provider.py
-- `test_stub_ai_provider_import()` --uses--> `StubAIProvider`  [INFERRED]
-  tests/test_imports.py → src/smm/ai/provider.py
+- `test_brand_profile_import()` --uses--> `BrandProfile`  [INFERRED]
+  tests/test_imports.py → src/smm/domain/models.py
+- `test_content_draft_import()` --uses--> `ContentDraft`  [INFERRED]
+  tests/test_imports.py → src/smm/domain/models.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (73 total, 19 thin omitted)
+## Communities (77 total, 19 thin omitted)
 
-### Community 0 - "test_imports.py"
-Cohesion: 0.05
-Nodes (51): Enum, AIProvider, GenerationRequest, GenerationResult, Protocol, Deterministic provider for local development and tests., StubAIProvider, main() (+43 more)
+### Community 0 - "ContentDraft"
+Cohesion: 0.16
+Nodes (17): Enum, ContentDraft, DraftStatus, PublishResult, MetaAdapter, Meta publishing boundary. Live API calls are intentionally not implemented yet., Publisher, Protocol (+9 more)
 
 ### Community 1 - "nextjs-dashboard/package.json"
 Cohesion: 0.05
-Nodes (34): nextConfig, dependencies, next, react, react-dom, devDependencies, eslint, eslint-config-next (+26 more)
+Nodes (33): nextConfig, dependencies, next, react, react-dom, devDependencies, eslint, eslint-config-next (+25 more)
 
 ### Community 2 - "AnalyticsSnapshot"
 Cohesion: 0.15
@@ -160,9 +164,17 @@ Nodes (3): buildCommand, framework, outputDirectory
 Cohesion: 0.83
 Nodes (3): get_settings(), Settings, test_config_import()
 
+### Community 12 - "Signal"
+Cohesion: 0.67
+Nodes (3): rank_signals(), Signal, test_wasm_signal_import()
+
+### Community 16 - "test_imports.py"
+Cohesion: 0.09
+Nodes (12): Verify that all imports in src/smm/ resolve correctly., test_ai_provider_protocol_import(), test_analytics_snapshot_import(), test_brand_profile_import(), test_content_draft_import(), test_generation_request_import(), test_generation_result_import(), test_moderation_result_import() (+4 more)
+
 ### Community 17 - "app/page.tsx"
-Cohesion: 0.10
-Nodes (19): Home(), DashboardCard(), ArchitectureSection(), layers, CtaBand(), HeroSection(), highlights, HighlightsStrip() (+11 more)
+Cohesion: 0.08
+Nodes (21): LoginPage(), Home(), DashboardCard(), SiteNav(), ArchitectureSection(), layers, CtaBand(), HeroSection() (+13 more)
 
 ### Community 25 - "Python to WebAssembly Migration Plan"
 Cohesion: 0.07
@@ -193,8 +205,8 @@ Cohesion: 0.12
 Nodes (15): Adaptation guide, Adaptation guide, Adaptation guide, CSS, CSS, CSS, HTML, HTML (+7 more)
 
 ### Community 32 - "dashboard/page.tsx"
-Cohesion: 0.07
-Nodes (25): LoginPage(), AnalyticsCards(), ApprovalQueue(), ApprovalQueueProps, AutomationStatusCard(), BrandProfileCard(), ContentDraftCard(), ContentDraftCardProps (+17 more)
+Cohesion: 0.08
+Nodes (23): AnalyticsCards(), ApprovalQueue(), ApprovalQueueProps, AutomationStatusCard(), BrandProfileCard(), ContentDraftCard(), ContentDraftCardProps, GraphData (+15 more)
 
 ### Community 33 - "Group 2: Purpose-Gate (technique allowed, purpose required)"
 Cohesion: 0.15
@@ -216,6 +228,10 @@ Nodes (11): Antislop Constraints Active, Brand Identity, DESIGN.md — S M M A I
 Cohesion: 0.17
 Nodes (11): Adapter Requirements, Cross-Platform Considerations, Goals, Migration from Phase 2, Overview, Phase 3: TikTok + YouTube, Risks and Constraints, Success Criteria (+3 more)
 
+### Community 38 - "ContentPlanner"
+Cohesion: 0.18
+Nodes (12): AIProvider, GenerationRequest, GenerationResult, Protocol, Deterministic provider for local development and tests., StubAIProvider, ContentPlan, ContentPlanner (+4 more)
+
 ### Community 39 - "Decorative Elements"
 Cohesion: 0.17
 Nodes (12): AI Capsule Badges, Colored Left Stripe, Decorative Elements, Decorative Status Dot, Emoji as Decoration, Eyebrow Badge Above the Headline, Fake Terminal Window, Generic AI Icons (+4 more)
@@ -235,6 +251,10 @@ Nodes (10): Group 3: Quality Locks (consistency), R-05 — Layout & Page Structu
 ### Community 43 - "Component specs"
 Cohesion: 0.20
 Nodes (9): Bar chart card, Card shell, Category / device breakdown list, Component specs, Layout grid, Line / area chart card, Metric (KPI) card, Pagination control (+1 more)
+
+### Community 44 - "BrandProfile"
+Cohesion: 0.26
+Nodes (9): main(), BrandProfile, ModerationResult, ModerationService, build_daily_draft(), test_build_daily_draft_import(), test_publishing_service_import(), test_empty_caption_is_rejected() (+1 more)
 
 ### Community 45 - "Group 3: Quality Locks (consistency)"
 Cohesion: 0.20
@@ -329,8 +349,8 @@ Cohesion: 0.50
 Nodes (4): Design Read (how the dials are set), Levers (how the dials become visual decisions), Part 3: Liveliness Toolkit, Three Dials (required)
 
 ## Knowledge Gaps
-- **534 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+529 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 608 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **533 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+528 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 609 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **19 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
@@ -338,7 +358,7 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `react` connect `dashboard/page.tsx` to `nextjs-dashboard/package.json`, `app/page.tsx`?**
   _High betweenness centrality (0.012) - this node is a cross-community bridge._
-- **Why does `AnalyticsSnapshot` connect `AnalyticsSnapshot` to `test_imports.py`?**
+- **Why does `AnalyticsSnapshot` connect `AnalyticsSnapshot` to `ContentDraft`, `test_imports.py`?**
   _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **Why does `Part 2: Mandatory Rules (R-01 to R-38, grouped)` connect `antislop` to `Group 2: Purpose-Gate (technique allowed, purpose required)`, `Group 3: Quality Locks (consistency)`, `Group 1: Hard Gate (absolute, no exceptions)`?**
   _High betweenness centrality (0.004) - this node is a cross-community bridge._
@@ -347,6 +367,6 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 11 inferred relationships involving `BrandProfile` (e.g. with `ContentPlanner` and `ModerationService`) actually correct?**
   _`BrandProfile` has 11 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `eslintConfig`, `nextConfig`, `name` to the rest of the system?**
-  _534 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `test_imports.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.05116279069767442 - nodes in this community are weakly interconnected._
+  _533 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `nextjs-dashboard/package.json` be split into smaller, more focused modules?**
+  _Cohesion score 0.05405405405405406 - nodes in this community are weakly interconnected._
