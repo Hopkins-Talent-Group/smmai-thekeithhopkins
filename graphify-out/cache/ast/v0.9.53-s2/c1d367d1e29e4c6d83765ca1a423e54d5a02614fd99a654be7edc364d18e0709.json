@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_nextjs_setup_nextjs_dashboard_prisma_migrations_20260930090000_draft_status_lowercase_migration_sql", "label": "migration.sql", "file_type": "code", "source_file": "nextjs-setup/nextjs-dashboard/prisma/migrations/20260930090000_draft_status_lowercase/migration.sql", "source_location": null}], "edges": []}

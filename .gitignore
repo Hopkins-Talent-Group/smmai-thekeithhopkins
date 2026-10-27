@@ -57,3 +57,5 @@ env.txt
 skills-lock.json
 .claude/
 .windsurf/
+.ox/
+graphify-out/.graphify_python
